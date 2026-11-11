@@ -23,6 +23,11 @@ with ZipFile(output, 'w', ZIP_DEFLATED) as archive:
             data = re.sub(r"define\('VEDASTRO_VERSION', '[^']+'\)", f"define('VEDASTRO_VERSION', '{args.version}')", data)
         if path.name == 'readme.txt':
             data = re.sub(r'(?m)^Stable tag: .*$', 'Stable tag: ' + args.version, data)
+        if path.name == 'README.md':
+            # Keep the installed ZIP small while preserving documentation links.
+            data = data.replace('src="docs/', 'src="https://raw.githubusercontent.com/VedAstro/VedAstro.WordPress/main/docs/')
+            data = data.replace('](docs/images/', '](https://raw.githubusercontent.com/VedAstro/VedAstro.WordPress/main/docs/images/')
+            data = data.replace('](docs/', '](https://github.com/VedAstro/VedAstro.WordPress/blob/main/docs/')
         archive.writestr('vedastro/' + path.relative_to(root).as_posix(), data.encode('utf-8'))
 with ZipFile(output) as archive:
     assert archive.testzip() is None
