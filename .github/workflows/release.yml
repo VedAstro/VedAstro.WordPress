@@ -1,0 +1,82 @@
+name: Test and release
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.4', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - name: PHP syntax and behavior
+        run: |
+          find . -name '*.php' -not -path './dist/*' -print0 | xargs -0 -n1 php -l
+          php tests/test.php
+      - name: Verify installable package
+        run: python3 scripts/build.py
+
+  wordpress:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: wordpress
+          MYSQL_DATABASE: wordpress
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost -pwordpress"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: wp-cli
+          extensions: mysqli
+      - name: Install WordPress and activate release package
+        run: |
+          python3 scripts/build.py
+          mkdir /tmp/wordpress
+          wp core download --path=/tmp/wordpress
+          wp config create --path=/tmp/wordpress --dbname=wordpress --dbuser=root --dbpass=wordpress --dbhost=127.0.0.1:3306
+          wp core install --path=/tmp/wordpress --url=http://localhost --title=Test --admin_user=admin --admin_password=integration-test-only --admin_email=test@example.com --skip-email
+          wp plugin install "$PWD/dist/vedastro.zip" --activate --path=/tmp/wordpress
+          wp eval-file "$PWD/tests/wordpress.php" --path=/tmp/wordpress
+
+  release:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: [test, wordpress]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package and publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="1.0.${GITHUB_RUN_NUMBER}"
+          TAG="v${VERSION}"
+          python3 scripts/build.py --version "$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" dist/vedastro.zip --clobber
+          else
+            gh release create "$TAG" dist/vedastro.zip --target "$GITHUB_SHA" --title "VedAstro $VERSION" --generate-notes --latest
+          fi
