@@ -28,7 +28,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('methods', nargs='*', help='Optional subset; free tier allows five calls/minute.')
     args = parser.parse_args()
-    selected = args.methods or list(calls)
+    selected = args.methods or (list(calls) if os.environ.get('VEDASTRO_API_KEY') else list(calls)[:4])
     if any(method not in calls for method in selected):
         parser.error('Choose from: ' + ', '.join(calls))
     if len(selected) > 5 and not os.environ.get('VEDASTRO_API_KEY'):

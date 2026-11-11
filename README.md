@@ -99,7 +99,7 @@ php tests/test.php
 python scripts/build.py
 ```
 
-The package contains one `vedastro/` directory and excludes tests, workflows, build scripts and repository metadata. Integration tests use mock responses to avoid depending on service uptime or consuming quota. To check the deployed API separately: `python scripts/smoke.py` (uses the shared free key or `VEDASTRO_API_KEY` environment variable).
+The package contains one `vedastro/` directory and excludes tests, workflows, build scripts and repository metadata. Integration tests use mock responses to avoid depending on service uptime or consuming quota. To check the deployed API separately: `python scripts/smoke.py` checks four bundled endpoints using the shared key. Set `VEDASTRO_API_KEY` to a subscription key to check all nine endpoints, or pass specific method names (up to five per minute with the free key).
 
 Report problems through [GitHub Issues](https://github.com/VedAstro/VedAstro.WordPress/issues). Include the shortcode with private birth information and keys removed, WordPress/PHP versions and the visible error.
 
