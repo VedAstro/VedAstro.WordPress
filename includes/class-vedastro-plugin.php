@@ -9,7 +9,7 @@ final class VedAstro_Plugin {
         add_action('wp_enqueue_scripts', function () {
             wp_enqueue_style('vedastro', plugins_url('assets/vedastro.css', dirname(__DIR__) . '/vedastro.php'), array(), VEDASTRO_VERSION);
         });
-        foreach (array('vedastro', 'vedastro_panchanga', 'vedastro_planets', 'vedastro_houses', 'vedastro_horoscope', 'vedastro_planet', 'vedastro_house', 'vedastro_dasa', 'vedastro_compatibility') as $tag) {
+        foreach (array('vedastro_chart', 'vedastro_ashtakavarga', 'vedastro', 'vedastro_panchanga', 'vedastro_planets', 'vedastro_houses', 'vedastro_horoscope', 'vedastro_planet', 'vedastro_house', 'vedastro_dasa', 'vedastro_compatibility') as $tag) {
             add_shortcode($tag, array(__CLASS__, 'shortcode'));
         }
     }
@@ -86,6 +86,9 @@ final class VedAstro_Plugin {
 
     public static function examples() {
         return array(
+            'South Indian birth chart' => '[vedastro_chart style="south" chart="RasiD1" date="1990-05-15 10:30"]',
+            'North Indian Navamsha chart' => '[vedastro_chart style="north" chart="NavamshaD9" date="1990-05-15 10:30"]',
+            'Ashtakavarga tables' => '[vedastro_ashtakavarga date="1990-05-15 10:30"]',
             'Daily Panchanga' => '[vedastro_panchanga]',
             'Nine planetary signs' => '[vedastro_planets date="1990-05-15 10:30"]',
             'Twelve house signs' => '[vedastro_houses date="1990-05-15 10:30"]',
@@ -129,6 +132,9 @@ final class VedAstro_Plugin {
     public static function shortcode($attributes, $content = null, $tag = 'vedastro') {
         $a = is_array($attributes) ? $attributes : array();
         $title = $a['title'] ?? ucwords(str_replace('_', ' ', $tag));
+        if (in_array($tag, array('vedastro_chart', 'vedastro_ashtakavarga'), true)) {
+            return VedAstro_Visuals::shortcode($a, $tag);
+        }
         $result = self::run($a, $content, $tag);
         $html = '<section class="vedastro-result" aria-label="' . esc_attr($title) . '"><h3>' . esc_html($title) . '</h3>';
         if (is_wp_error($result)) {

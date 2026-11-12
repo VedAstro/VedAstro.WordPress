@@ -8,11 +8,13 @@
 
 <p align="center">WordPress 6.0+ &nbsp; · &nbsp; PHP 7.4+ &nbsp; · &nbsp; Free &amp; open source</p>
 
-Bring Vedic astrology to your corner of the web. Add a daily Panchanga, planetary positions or birth-chart predictions to a WordPress page with a shortcode. Set your location once, then make it your own.
+Bring Vedic astrology to your corner of the web. Add North or South Indian birth charts, Ashtakavarga tables, daily Panchanga or birth-chart predictions to a WordPress page with a shortcode. Set your location once, then make it your own.
 
 ## See it in WordPress
 
-![Daily Panchanga rendered by the installed plugin on a WordPress demo page](docs/images/panchanga.png)
+![North and South Indian birth charts rendered by the WordPress plugin](docs/images/charts.png)
+
+![Ashtakavarga points table with twelve zodiac signs and totals](docs/images/ashtakavarga.png)
 
 *Cropped excerpts of real plugin output with live VedAstro calculations. Only the widget is shown; your theme controls the surrounding page design.*
 
@@ -49,6 +51,18 @@ Preview your page. You now have Panchanga for the current hour at your chosen lo
 Your API key stays on your WordPress server. It is never displayed to visitors.
 
 </details>
+
+## Birth charts and Ashtakavarga
+
+Choose North or South Indian layout, with Rasi (D1), Navamsha (D9) and other supported divisional charts:
+
+```text
+[vedastro_chart style="south" chart="RasiD1" date="1990-05-15 10:30"]
+[vedastro_chart style="north" chart="NavamshaD9" date="1990-05-15 10:30"]
+[vedastro_ashtakavarga date="1990-05-15 10:30"]
+```
+
+Ashtakavarga includes **Sarvashtakavarga and Bhinnashtakavarga** tables, with twelve sign columns (Aries–Pisces) and totals. Use `table="sarva"` or `table="bhinna"` for just one table. Each chart or table uses one API request on a cache miss; the default pair of tables uses two. Birth dates are required for these widgets. Charts are displayed as SVG images; your site's Content Security Policy must allow `data:` images.
 
 ## What will you add?
 

@@ -7,12 +7,12 @@ Stable tag: 1.0.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Panchanga, planets, houses, horoscope predictions, Dasa and compatibility through the VedAstro API.
+North and South Indian birth charts, Ashtakavarga tables, Panchanga, predictions, Dasa and compatibility.
 
 == Description ==
 Server-rendered shortcodes with server-side API keys, cached results and escaped output. The generic [vedastro] shortcode also supports other Calculate methods. See the included README.md for examples and settings.
 
-External service: calculations send supplied dates, locations, parameters and the configured API key to https://vedastro.zaishi.net/api/Calculate/ when rendering uncached results. No background telemetry. API limits and subscriptions apply. Service: https://vedastro.org — privacy: https://vedastro.org/PrivacyPolicy.html
+External service: calculations send supplied dates, locations, parameters and the configured API key to https://vedastro.zaishi.net/api/Calculate/ when rendering uncached results. No background telemetry. API limits and subscriptions apply. Service: https://vedastro.org â€” privacy: https://vedastro.org/PrivacyPolicy.html
 
 == Installation ==
 1. Download vedastro.zip from https://github.com/VedAstro/VedAstro.WordPress/releases/latest

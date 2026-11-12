@@ -7,7 +7,11 @@ add_filter('pre_http_request', function ($pre, $args, $url) use (&$seen) {
     if (strpos($url, VedAstro_Client::BASE_URL) !== 0) { return $pre; }
     $endpoint = basename($url);
     $seen[] = array($endpoint, json_decode($args['body'], true));
-    return array('headers' => array(), 'body' => wp_json_encode(array('Status' => 'Pass', 'Payload' => array($endpoint => array('Name' => '<script>bad</script>', 'Value' => 0)))), 'response' => array('code' => 200, 'message' => 'OK'), 'cookies' => array());
+    if (in_array($endpoint, array('SouthIndianChart','NorthIndianChart'),true)) { $payload='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"></svg>'; }
+    elseif (in_array($endpoint,array('SarvashtakavargaChart','BhinnashtakavargaChart'),true)) { $payload=array('Sun'=>array('Rows'=>array_fill(0,12,3),'Total'=>36)); }
+    else { $payload=array('Name'=>'<script>bad</script>','Value'=>0); }
+
+    return array('headers' => array(), 'body' => (in_array($endpoint,array('SouthIndianChart','NorthIndianChart'),true) ? $payload : wp_json_encode(array('Status' => 'Pass', 'Payload' => array($endpoint => $payload)))), 'response' => array('code' => 200, 'message' => 'OK'), 'cookies' => array());
 }, 10, 3);
 foreach (VedAstro_Plugin::examples() as $example) {
     $html = do_shortcode($example);

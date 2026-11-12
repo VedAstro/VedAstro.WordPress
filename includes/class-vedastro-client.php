@@ -47,6 +47,10 @@ final class VedAstro_Client {
             return new WP_Error('vedastro_http', 'VedAstro could not complete this request (HTTP ' . (int) $status . ').');
         }
         $data = json_decode(wp_remote_retrieve_body($response), true);
+        // Chart endpoints return an SVG document instead of a JSON envelope.
+        if (in_array($endpoint, array('NorthIndianChart', 'SouthIndianChart'), true) && strpos(wp_remote_retrieve_body($response), '<svg') !== false && $data === null) {
+            $data = array('Status' => 'Pass', 'Payload' => array($endpoint => wp_remote_retrieve_body($response)));
+        }
         if (is_array($data) && ($data['Status'] ?? '') === 'Fail' && is_string($data['Payload'] ?? null) && stripos($data['Payload'], 'rate limit') !== false) {
             return new WP_Error('vedastro_limit', 'VedAstro API rate limit reached. Please try again later or configure your subscription key in Settings.');
         }

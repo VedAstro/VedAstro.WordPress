@@ -77,7 +77,7 @@ if (!is_wp_error($time)) {
 - Full-page caches can serve older output without running PHP. Configure their expiration to suit your content. Large all-data calculations may exceed the default 30-second request timeout; adjust it in Settings (5–120 seconds).
 - Birth data written into a public post and its rendered results are public. Do not put confidential birth details into public shortcodes. Transient results live in the site's database or configured object cache until expiration. Uninstall removes plugin settings and its database transients on the current site. External object caches expire their entries normally.
 - The Settings API restricts configuration to administrators and protects saves with WordPress nonces. Keys are never rendered in the settings form or returned in visitor errors. For configuration outside the database, define `VEDASTRO_API_KEY` in `wp-config.php`.
-- The plugin escapes all API text, including prediction descriptions, and does not execute API HTML, SVG, scripts, or nested shortcodes.
+- The plugin escapes all API text, including prediction descriptions, and does not execute API HTML, scripts, or nested shortcodes; dedicated chart widgets display SVG only as inert images.
 - [VedAstro privacy policy](https://vedastro.org/PrivacyPolicy.html) and [service website](https://vedastro.org) apply to external API use. No data requests occur merely by activating the plugin.
 
 This replaces the old, incomplete `horoscope_predictions` plugin. Replace old shortcodes with the examples above; ISO `timeurl` values are no longer used. Settings are not automatically migrated.
@@ -104,3 +104,9 @@ The package contains one `vedastro/` directory and excludes tests, workflows, bu
 Report problems through [GitHub Issues](https://github.com/VedAstro/VedAstro.WordPress/issues). Include the shortcode with private birth information and keys removed, WordPress/PHP versions and the visible error.
 
 License: GPL-2.0-or-later.
+
+## Birth chart and Ashtakavarga widgets
+
+`[vedastro_chart style="south" chart="RasiD1" date="1990-05-15 10:30"]` displays a South Indian chart. Set `style="north"` for North Indian layout. The `chart` attribute supports RasiD1, NavamshaD9, BhavaChalit and the API's other divisional chart enum names (D2–D60). Both layouts accept all shared location, timezone, ayanamsa and title attributes. The plugin embeds charts as inert SVG images, not active inline markup. A Content Security Policy must allow `img-src data:`. An explicit birth `date` is required.
+
+`[vedastro_ashtakavarga date="1990-05-15 10:30"]` displays Sarvashtakavarga and Bhinnashtakavarga tables. Set `table="sarva"` or `table="bhinna"` for one. Columns 1–12 represent zodiac signs Aries–Pisces, not houses; values and totals are supplied by the API. Tables scroll horizontally on narrow screens. `format="json"` is for the general data shortcodes; these two dedicated widgets always show visual output.

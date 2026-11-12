@@ -25,6 +25,7 @@ function wp_remote_post($url, $args) {
 function wp_remote_retrieve_response_code($v) { return $v['code']; }
 function wp_remote_retrieve_body($v) { return $v['body']; }
 require __DIR__ . '/../includes/class-vedastro-client.php';
+require __DIR__ . '/../includes/class-vedastro-visuals.php';
 require __DIR__ . '/../includes/class-vedastro-plugin.php';
 function check($condition, $label) {
     if (!$condition) { throw new RuntimeException($label); }
@@ -87,4 +88,22 @@ check(strpos($html, 'Tithi') !== false && strpos($html, 'Sunset') !== false && i
 response(array('Test' => 'ok'));
 VedAstro_Plugin::shortcode(array('endpoint' => 'Test', 'time_param' => 'none'), '{"options":{}}');
 check(!isset($request[1]['time']) && $request[1]['options'] === array(), 'generic methods can omit automatic time');
+
+
+response(array('SouthIndianChart' => '<svg xmlns="http://www.w3.org/2000/svg"><script>bad()</script></svg>'));
+$html = VedAstro_Plugin::shortcode(array('date'=>'1990-05-15 10:30'), null, 'vedastro_chart');
+check(strpos($html, 'data:image/svg+xml;base64,') !== false && strpos($html, '<script>') === false, 'SVG isolated as an image');
+$next = array('code'=>200,'body'=>'<!-- chart --><svg xmlns="http://www.w3.org/2000/svg"></svg>'); $cache=array();
+check(is_string(VedAstro_Client::calculate('NorthIndianChart')), 'raw SVG endpoint supported');
+check(strpos(VedAstro_Plugin::shortcode(array('date'=>'1990-05-15 10:30','style'=>'bad'), null, 'vedastro_chart'), 'vedastro-error') !== false, 'chart style validated');
+response(array('SarvashtakavargaChart'=>array('Sun'=>array('Rows'=>array_fill(0,12,3),'Total'=>36))));
+$html=VedAstro_Plugin::shortcode(array('date'=>'1990-05-15 10:30','table'=>'sarva'),null,'vedastro_ashtakavarga');
+check(strpos($html,'Aries–Pisces') !== false && strpos($html,'<strong>36</strong>') !== false, 'twelve sign columns and total rendered');
+check(is_wp_error(VedAstro_Visuals::table(array('Sun'=>array('Rows'=>array(1),'Total'=>1)), 'Test')), 'malformed table rejected');
+
+response(array('NorthIndianChart'=>'<svg xmlns="http://www.w3.org/2000/svg"></svg>'));
+$html=VedAstro_Plugin::shortcode(array('date'=>'1990-05-15 10:30','style'=>'north','chart'=>'NavamshaD9'),null,'vedastro_chart');
+check($request[0] === VedAstro_Client::BASE_URL.'NorthIndianChart' && $request[1]['chartType']==='NavamshaD9', 'North Indian divisional chart request');
+check(strpos(VedAstro_Plugin::shortcode(array(),null,'vedastro_chart'),'vedastro-error')!==false,'birth date required for charts');
+
 echo "All contract tests passed.\n";
