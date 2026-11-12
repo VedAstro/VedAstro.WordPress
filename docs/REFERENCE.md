@@ -20,6 +20,9 @@ wp plugin install https://github.com/VedAstro/VedAstro.WordPress/releases/latest
 ## Shortcodes
 
 ```text
+[vedastro_chart style="south" chart="RasiD1" date="1990-05-15 10:30"]
+[vedastro_chart style="north" chart="NavamshaD9" date="1990-05-15 10:30"]
+[vedastro_ashtakavarga date="1990-05-15 10:30"]
 [vedastro_panchanga]
 [vedastro_planets date="1990-05-15 10:30"]
 [vedastro_houses date="1990-05-15 10:30"]
@@ -32,6 +35,8 @@ wp plugin install https://github.com/VedAstro/VedAstro.WordPress/releases/latest
 
 | Shortcode | Result |
 | --- | --- |
+| `vedastro_chart` | North or South Indian birth chart; Rasi, Navamsha and other supported divisional charts |
+| `vedastro_ashtakavarga` | Sarvashtakavarga and Bhinnashtakavarga tables with twelve sign columns and totals |
 | `vedastro_panchanga` | Bundled Panchanga, including Tithi, Nakshatra, Yoga, Karana, weekday, sunrise and sunset (one API request) |
 | `vedastro_planets` | Rasi signs of all nine planets |
 | `vedastro_houses` | Bhava Chalit signs of all twelve houses |
@@ -42,9 +47,72 @@ wp plugin install https://github.com/VedAstro/VedAstro.WordPress/releases/latest
 | `vedastro_compatibility` | Match report; `date` is male birth time and `partner_date` is female birth time, matching the API contract |
 | `vedastro` | Any Calculate endpoint with JSON parameters |
 
-All preset shortcodes accept `date`, `location`, `latitude`, `longitude`, `timezone`, `ayanamsa`, `title`, and `format="json"`. Dates use **YYYY-MM-DD HH:MM** in the selected timezone. Omit `date` for the current hour. Natal calculations should use an explicit birth date; Dasa and compatibility require one. A timezone such as `America/New_York` applies the UTC offset for the supplied date. Ambiguous repeated times during a daylight-saving transition should use an explicit offset such as `-05:00`.
+All preset shortcodes accept `date`, `location`, `latitude`, `longitude`, `timezone`, `ayanamsa` and `title`. The general data shortcodes also accept `format="json"`; `vedastro_chart` and `vedastro_ashtakavarga` always render their visual output. Dates use **YYYY-MM-DD HH:MM** in the selected timezone. Omit `date` for the current hour. Natal calculations should use an explicit birth date; birth charts, Ashtakavarga, Dasa and compatibility require one. A timezone such as `America/New_York` applies the UTC offset for the supplied date. Ambiguous repeated times during a daylight-saving transition should use an explicit offset such as `-05:00`.
 
 Compatibility accepts independent `partner_location`, `partner_latitude`, `partner_longitude`, and `partner_timezone`; omitted partner location settings inherit the first person's settings. Set all four when the birth locations differ. Supported planet names include Sun, Moon, Mars, Mercury, Jupiter, Venus, Saturn, Rahu and Ketu; houses use House1 through House12. Ayanamsa names are the API enum names, e.g. RAMAN or LAHIRI.
+
+## North and South Indian birth charts
+
+![North and South Indian charts rendered by the WordPress plugin](images/charts.png)
+
+```text
+[vedastro_chart style="south" chart="RasiD1" date="1990-05-15 10:30"]
+[vedastro_chart style="north" chart="RasiD1" date="1990-05-15 10:30"]
+[vedastro_chart style="south" chart="NavamshaD9" date="1990-05-15 10:30" title="My Navamsha chart"]
+```
+
+| Attribute | Default | Meaning |
+| --- | --- | --- |
+| `date` | Required | Birth date and time, `YYYY-MM-DD HH:MM`, in the selected timezone |
+| `style` | `south` | `south` for South Indian layout or `north` for North Indian layout |
+| `chart` | `RasiD1` | Exact chart type from the table below |
+| `title` | `Birth chart` | Heading above the chart |
+| `location`, `latitude`, `longitude`, `timezone`, `ayanamsa` | Saved settings | Override the calculation defaults for this widget |
+
+### Supported chart types
+
+| Chart | `chart` value |
+| --- | --- |
+| Bhava Chalit | `BhavaChalit` |
+| Rasi D1 | `RasiD1` |
+| Hora D2 | `HoraD2` |
+| Drekkana D3 | `DrekkanaD3` |
+| Chaturthamsha D4 | `ChaturthamshaD4` |
+| Saptamsha D7 | `SaptamshaD7` |
+| Navamsha D9 | `NavamshaD9` |
+| Dashamamsha D10 | `DashamamshaD10` |
+| Dwadashamsha D12 | `DwadashamshaD12` |
+| Shodashamsha D16 | `ShodashamshaD16` |
+| Vimshamsha D20 | `VimshamshaD20` |
+| Chaturvimshamsha D24 | `ChaturvimshamshaD24` |
+| Bhamsha D27 | `BhamshaD27` |
+| Trimshamsha D30 | `TrimshamshaD30` |
+| Khavedamsha D40 | `KhavedamshaD40` |
+| Akshavedamsha D45 | `AkshavedamshaD45` |
+| Shashtyamsha D60 | `ShashtyamshaD60` |
+
+Each chart makes one API request on a cache miss. Add two Shortcode blocks to display Rasi and Navamsha together. Charts resize to their container. They are embedded as SVG images, never active inline markup. If your site sets a Content Security Policy, its `img-src` directive must permit `data:` images. These widgets do not support `format="json"` or enclosed JSON parameters.
+
+## Ashtakavarga tables
+
+![Ashtakavarga table rendered by the WordPress plugin](images/ashtakavarga.png)
+
+```text
+[vedastro_ashtakavarga date="1990-05-15 10:30"]
+[vedastro_ashtakavarga table="sarva" date="1990-05-15 10:30" title="Sarvashtakavarga points"]
+[vedastro_ashtakavarga table="bhinna" date="1990-05-15 10:30"]
+```
+
+| Attribute | Default | Meaning |
+| --- | --- | --- |
+| `date` | Required | Birth date and time, `YYYY-MM-DD HH:MM` |
+| `table` | `both` | `both`, `sarva` (Sarvashtakavarga), or `bhinna` (Bhinnashtakavarga) |
+| `title` | `Ashtakavarga` | Heading above the tables |
+| `location`, `latitude`, `longitude`, `timezone`, `ayanamsa` | Saved settings | Override calculation defaults for this widget |
+
+Columns 1–12 represent zodiac signs **Aries through Pisces**, not houses. Row values and totals come from the API. The Sarvashtakavarga table includes the combined Sarvashtakavarga row; Bhinnashtakavarga lists the seven classical planets. Tables scroll horizontally on narrow screens using a keyboard-focusable region.
+
+`table="both"` makes two API requests on a cache miss, one per table. Choosing `sarva` or `bhinna` makes one. These widgets always render tables; `format="json"` and enclosed JSON parameters do not apply.
 
 ## Other endpoints
 
@@ -72,7 +140,7 @@ if (!is_wp_error($time)) {
 
 ## Operation and privacy
 
-- Requests go server-to-server to `https://vedastro.zaishi.net/api/Calculate/{method}` using POST JSON and the `x-api-key` header. Supplied birth dates, coordinates, parameters and the configured API key are sent to VedAstro only when a shortcode or PHP calculation runs on a cache miss. There is no background telemetry or visitor-facing calculation endpoint. The free tier currently allows five requests per minute; each preset makes one request per cache miss.
+- Requests go server-to-server to `https://vedastro.zaishi.net/api/Calculate/{method}` using POST JSON and the `x-api-key` header. Supplied birth dates, coordinates, parameters and the configured API key are sent to VedAstro only when a shortcode or PHP calculation runs on a cache miss. There is no background telemetry or visitor-facing calculation endpoint. The free tier currently allows five requests per minute; most presets make one request per cache miss; Ashtakavarga with `table="both"` makes two.
 - Successful results are stored in WordPress transients for 60 minutes by default. Keys include the method, parameters, API key and ayanamsa. Failures are not cached. Set cache minutes to 0 to disable this cache. Current-time calculations use the current hour for reusable cache entries.
 - Full-page caches can serve older output without running PHP. Configure their expiration to suit your content. Large all-data calculations may exceed the default 30-second request timeout; adjust it in Settings (5–120 seconds).
 - Birth data written into a public post and its rendered results are public. Do not put confidential birth details into public shortcodes. Transient results live in the site's database or configured object cache until expiration. Uninstall removes plugin settings and its database transients on the current site. External object caches expire their entries normally.
@@ -104,9 +172,3 @@ The package contains one `vedastro/` directory and excludes tests, workflows, bu
 Report problems through [GitHub Issues](https://github.com/VedAstro/VedAstro.WordPress/issues). Include the shortcode with private birth information and keys removed, WordPress/PHP versions and the visible error.
 
 License: GPL-2.0-or-later.
-
-## Birth chart and Ashtakavarga widgets
-
-`[vedastro_chart style="south" chart="RasiD1" date="1990-05-15 10:30"]` displays a South Indian chart. Set `style="north"` for North Indian layout. The `chart` attribute supports RasiD1, NavamshaD9, BhavaChalit and the API's other divisional chart enum names (D2–D60). Both layouts accept all shared location, timezone, ayanamsa and title attributes. The plugin embeds charts as inert SVG images, not active inline markup. A Content Security Policy must allow `img-src data:`. An explicit birth `date` is required.
-
-`[vedastro_ashtakavarga date="1990-05-15 10:30"]` displays Sarvashtakavarga and Bhinnashtakavarga tables. Set `table="sarva"` or `table="bhinna"` for one. Columns 1–12 represent zodiac signs Aries–Pisces, not houses; values and totals are supplied by the API. Tables scroll horizontally on narrow screens. `format="json"` is for the general data shortcodes; these two dedicated widgets always show visual output.
