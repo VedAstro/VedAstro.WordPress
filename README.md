@@ -14,7 +14,7 @@ Bring Vedic astrology to your corner of the web. Add a daily Panchanga, planetar
 
 ![Daily Panchanga rendered by the installed plugin on a WordPress demo page](docs/images/panchanga.png)
 
-*Real plugin output with live VedAstro calculations, shown in a sample WordPress theme. Your theme controls the surrounding page design.*
+*Cropped excerpts of real plugin output with live VedAstro calculations. Only the widget is shown; your theme controls the surrounding page design.*
 
 <table>
 <tr><th>Follow the day</th><th>Explore a birth chart</th><th>Look a little deeper</th></tr>
